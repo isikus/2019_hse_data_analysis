@@ -3,8 +3,16 @@ df <- read_csv("https://raw.githubusercontent.com/agricolamz/2019_data_analysis_
 prod(dnorm(df$consonants, mean = 22, sd = 6))
 
 ### 3.2
-
-
+daf <- read_csv("https://raw.githubusercontent.com/agricolamz/2019_data_analysis_for_linguists/master/data/letter_frequency.csv")
+langs = c("French","German","Spanish","Portuguese","Esperanto","Italian","Turkish","Swedish","Polish","Dutch","Danish","Icelandic","Finnish")
+l  <- vector("numeric", 13L)
+for(i in 1:13) l[i] <- prod(daf[13,i],daf[15,i],daf[19,i],daf[20,i])
+res <- data_frame(model = langs,
+           prior = 1/length(langs),
+           likelihood = l,
+           product = prior*likelihood,
+           posterior = product/sum(product))
+max(res$posterior)
 
 ### 3.3
 
