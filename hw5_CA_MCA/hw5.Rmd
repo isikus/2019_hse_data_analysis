@@ -1,0 +1,49 @@
+library(tidyverse)
+library(ggfortify)
+library(GGally)
+library(ca)
+
+### 5.1
+df <- read.csv("https://raw.githubusercontent.com/agricolamz/2019_data_analysis_for_linguists/master/data/students/isikus/hw5_CA_MCA/hw5_chairs.csv")
+
+MCA <- MASS::mca(df[,-c(1:3)])
+MCA
+
+df <- cbind(df, MCA$rs)
+variables <- as_data_frame(MCA$cs)
+variables$var_names <- rownames(MCA$cs)
+df %>% 
+  ggplot(aes(`1`, `2`))+
+  geom_point(aes(color = Category))+
+  stat_ellipse(aes(color = Category))+
+  geom_text(data = variables, aes(`1`, `2`, label = var_names))+
+  theme_bw()+
+  scale_x_continuous(limits = c(-0.015, 0.02))
+
+### 5.2
+cat("Контекст употребления Stuhl кажется более широким, чем Sessel, но, хотя у каждой категории есть ядерный центр, они много пересекаются и их употребление смешано. Как и ожидалось, для Sessel более характерно качание, глубина и откидывание, но, однако, не вращание и катание. Множество факторов (переменных) при этом расположено в центре графика, и про их принадлежность нельзя сделать однозначный вывод, как и не вполне корректно делать однозначные выводы, опираясь исключительно на результаты визуализации MCA.")
+
+### 5.3
+df <- read.csv("https://github.com/agricolamz/2019_data_analysis_for_linguists/raw/master/data/students/isikus/hw5_CA_MCA/hw5_colreg.csv")
+
+rownames(df) <- df$colors
+cares <- ca(df[-5])
+cares
+
+df_col <- data.frame(cares$colcoord)
+df_col$rows <- rownames(cares$colcoord)
+
+df_row <- data.frame(cares$rowcoord)
+df_row$rows <- rownames(cares$rowcoord)
+
+df_col %>% 
+  ggplot(aes(Dim1, Dim2, label = rows))+
+  geom_text(color = "blue")+
+  geom_text(data = df_row, color = "red")+
+  theme_bw()+
+  labs(x = "Dim1 (77.9%)",
+       y = "Dim2 (19.2%)")
+
+
+### 5.4
+cat("Данные достаточно широко разбросаны для надёжной интерпретации. Можно отметить удалённость регистра academic от использования цветов, что предсказуемо; теория о восприятии цвета может также объяснить последовательную удалённость оттенков серого от прочих цветов и более базовых цветов (green, red) от тех, которые, как считается, стали выделяться позже. Регистр spoken при этом ближе к чёрно-белым оттенкам, в то время как press и fiction, для которых важна образность, группируются с цветами спектра.")
